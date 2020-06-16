@@ -1,0 +1,20 @@
+[package]
+authors = ["Will Beers <whbeers@gmail.com>"]
+edition = "2018"
+name = "moisture-preempt"
+readme = "README.md"
+version = "0.1.0"
+
+[dependencies]
+embedded-hal = "0.2.3"
+cortex-m = "0.6.0"
+cortex-m-rt = "0.6.10"
+cortex-m-rtic = "0.5.3"
+cortex-m-semihosting = "0.3.3"
+panic-halt = "0.2.0"
+panic-semihosting = "*"
+stm32f1 = "0.11.0"
+
+[dependencies.stm32f1xx-hal]
+version = "0.6.0"
+features = ["stm32f103", "rt", "medium"]
