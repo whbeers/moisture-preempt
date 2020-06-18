@@ -1,5 +1,5 @@
-//! Concurrent program to blink an LED based at a rate that changes based on
-//! the ADC reading of a moisture sensor.
+//! simple program to blink an LED at a rate that changes based on ADC
+//! readings from a moisture sensor.
 
 
 #![deny(unsafe_code)]
