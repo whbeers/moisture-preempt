@@ -7,7 +7,6 @@
 #![no_main]
 #![no_std]
 
-//use cortex_m_semihosting::hprintln;
 use stm32f1xx_hal::{
     adc,
     gpio,
@@ -18,13 +17,12 @@ use stm32f1xx_hal::{
 use stm32f1::stm32f103::ADC1;
 use stm32f1::stm32f103::TIM2;
 use stm32f1::stm32f103::TIM3;
-//use embedded_hal::digital::v2::OutputPin;
 use panic_semihosting as _;
 
 
-const LED_BASE_RATE: u16 = 2;  // 2hz
+const LED_BASE_RATE: u32 = 2;  // 2hz
 const ADC_RATE: u32 = 2;  // 2hz
-const MOISTURE_SCALING_FACTOR: u16 = 200;  // scale by factor of 200
+const MOISTURE_SCALING_FACTOR: u32 = 200;  // scale by factor of 200
 
 
 #[rtic::app(device = stm32f1xx_hal::pac, peripherals = true)]
@@ -67,14 +65,10 @@ const APP: () = {
         let mut gpioc = device.GPIOC.split(&mut rcc.apb2);
         let internal_led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
         
-        //let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(20.hz());        
-
-        let tim2 = device.TIM2;
-        let mut led_rate_timer = Timer::tim2(tim2, &clocks, &mut rcc.apb1)
-            .start_count_down((LED_BASE_RATE as u32).hz());
+        let mut led_rate_timer = Timer::tim2(device.TIM2, &clocks, &mut rcc.apb1)
+            .start_count_down(LED_BASE_RATE.hz());
         led_rate_timer.listen(Event::Update);
-        let tim3 = device.TIM3;
-        let mut sensor_rate_timer = Timer::tim3(tim3, &clocks, &mut rcc.apb1)
+        let mut sensor_rate_timer = Timer::tim3(device.TIM3, &clocks, &mut rcc.apb1)
             .start_count_down(ADC_RATE.hz());
         sensor_rate_timer.listen(Event::Update);
 
@@ -96,7 +90,7 @@ const APP: () = {
         cx.resources.internal_led.toggle().unwrap();
 
         // store new rate to avoid a double-borrow
-        let mut new_rate: u32 = LED_BASE_RATE.into();
+        let mut new_rate: u32 = LED_BASE_RATE;
         cx.resources.led_blink_rate.lock(|led_blink_rate| {
           new_rate = *led_blink_rate;
         });
@@ -118,9 +112,7 @@ const APP: () = {
                             ).unwrap();
 
         // compute new rate
-        let new_rate: u32 = (LED_BASE_RATE +
-                             (moisture / MOISTURE_SCALING_FACTOR)
-                            ).into();
+        let new_rate: u32 = LED_BASE_RATE + (moisture as u32 / MOISTURE_SCALING_FACTOR);
         *cx.resources.led_blink_rate = new_rate;
 
         cx.resources.sensor_rate_timer.clear_update_interrupt_flag();
