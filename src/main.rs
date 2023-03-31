@@ -119,4 +119,18 @@ const APP: () = {
         cx.resources.sensor_rate_timer.start(ADC_RATE.hz());
     }
 
+    // TODO(whbeers): implement wifi interface
+    // requirements:
+    //  - pull CHIP_EN high using a digital GPIO to turn on esp8266
+    //  - configure a USART or SPI connection to interface with wifi 
+    //  - craft and send a sequence of commands to connect to a wifi network
+    //  - craft and send a moisture reading (to something)
+    //  - deconfigure
+    //  - pull CHIP_EN low to power down esp8266
+    
+    // TODO(whbeers): implement power management
+    // requirements:
+    //  - research VBAT tolerances vs lipo voltage range
+    //  - if VBAT is usable:
+    //  -  configure wakeup and shutdown timers, masking TIM2/TIM3 while off
 };
